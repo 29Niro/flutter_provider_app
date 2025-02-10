@@ -19,8 +19,8 @@ class PostCard extends StatelessWidget {
       height: 200,
       child: Card(
         color: const Color.fromARGB(255, 249, 216, 255),
-        elevation: 2, 
-        margin: const EdgeInsets.all(8),
+        elevation: 2,
+        margin: const EdgeInsets.only(top: 15, left: 15, right: 15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -39,19 +39,18 @@ class PostCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8), 
+              const SizedBox(height: 8),
               Text(
                 post.body,
                 textAlign: TextAlign.justify,
                 style: TextStyle(
-                  
                   fontSize: 14,
                   color: Colors.grey[600],
                 ),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8), 
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
