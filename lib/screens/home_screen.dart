@@ -29,16 +29,14 @@ class _HomeScreenState extends State<HomeScreen> {
           content: Text("Are you sure you want to delete this post?"),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context), // Cancel button
+              onPressed: () => Navigator.pop(context),
               child: Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
                 Provider.of<PostProvider>(context, listen: false)
                     .deletePost(postId);
-
                 Navigator.pop(context);
-
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text("Post deleted successfully!"),
@@ -70,6 +68,49 @@ class _HomeScreenState extends State<HomeScreen> {
             return Center(child: CircularProgressIndicator());
           }
 
+          if (postProvider.errorMessage != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, color: Colors.red, size: 60),
+                  SizedBox(height: 16),
+                  Text(
+                    postProvider.errorMessage!,
+                    style: TextStyle(color: Colors.red, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => postProvider.loadPosts(),
+                    child: Text("Retry"),
+                  )
+                ],
+              ),
+            );
+          }
+
+          if (postProvider.posts.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.post_add, color: Colors.grey, size: 60),
+                  SizedBox(height: 16),
+                  Text(
+                    "No posts available",
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => postProvider.loadPosts(),
+                    child: Text("Refresh"),
+                  )
+                ],
+              ),
+            );
+          }
+
           return ListView.builder(
             itemCount: postProvider.posts.length,
             itemBuilder: (context, index) {
@@ -93,6 +134,8 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.purple,
         child: Icon(Icons.add),
         onPressed: () {
           Navigator.push(
