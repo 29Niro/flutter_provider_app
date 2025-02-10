@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_app/screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import 'providers/post_provider.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,12 +12,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Provider App',
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => PostProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Provider App',
+        theme: ThemeData(primarySwatch: Colors.deepPurple),
+        home: HomeScreen(),
       ),
-      home: HomeScreen(),
     );
   }
 }

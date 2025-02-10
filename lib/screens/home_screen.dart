@@ -1,39 +1,53 @@
 import 'package:flutter/material.dart';
-import '../models/post_model.dart';
+import 'package:provider/provider.dart';
+import '../providers/post_provider.dart';
 import 'add_post_screen.dart';
 import 'edit_post_screen.dart';
 import '../widgets/post_card.dart';
 
-class HomeScreen extends StatelessWidget {
-  final List<Post> posts = [
-    Post(id: 1, title: "First Post", body: "This is the first post."),
-    Post(id: 2, title: "Second Post", body: "This is the second post."),
-    Post(id: 3, title: "Third Post", body: "This is the third post."),
-  ];
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
-  HomeScreen({super.key});
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(
+        () => Provider.of<PostProvider>(context, listen: false).loadPosts());
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Flutter CRUD App")),
-      body: ListView.builder(
-        itemCount: posts.length,
-        itemBuilder: (context, index) {
-          final post = posts[index];
-          return PostCard(
-            post: post,
-            onEdit: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditPostScreen(post: post),
-                ),
+      appBar: AppBar(title: Text("Flutter Provider App")),
+      body: Consumer<PostProvider>(
+        builder: (context, postProvider, child) {
+          if (postProvider.isLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          return ListView.builder(
+            itemCount: postProvider.posts.length,
+            itemBuilder: (context, index) {
+              final post = postProvider.posts[index];
+              return PostCard(
+                post: post,
+                onEdit: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditPostScreen(post: post),
+                    ),
+                  );
+                },
+                onDelete: () {
+                  postProvider.deletePost(post.id);
+                },
               );
-            },
-            onDelete: () {
-              // Hardcoded delete functionality (later use Provider)
-              print("Deleted Post ID: ${post.id}");
             },
           );
         },
