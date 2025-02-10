@@ -57,7 +57,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Flutter Provider App")),
+      appBar: AppBar(
+        title: Text(
+          "Flutter Provider App",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.purple,
+      ),
       body: Consumer<PostProvider>(
         builder: (context, postProvider, child) {
           if (postProvider.isLoading) {

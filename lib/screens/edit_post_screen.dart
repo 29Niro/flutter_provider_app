@@ -24,11 +24,33 @@ class EditPostScreen extends StatelessWidget {
           children: [
             TextField(
               controller: titleController,
-              decoration: InputDecoration(labelText: "Title"),
+              decoration: InputDecoration(
+                labelText: "Title",
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                filled: true,
+                fillColor: Colors.grey[200],
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              ),
             ),
+            SizedBox(height: 20), 
             TextField(
               controller: bodyController,
-              decoration: InputDecoration(labelText: "Body"),
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: "Body",
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                filled: true,
+                fillColor: Colors.grey[200],
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -68,6 +90,15 @@ class EditPostScreen extends StatelessWidget {
                   );
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 2,
+              ),
               child: Text("Update Post"),
             ),
           ],

@@ -14,20 +14,46 @@ class AddPostScreen extends StatelessWidget {
     final postProvider = Provider.of<PostProvider>(context, listen: false);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Add Post")),
+      appBar: AppBar(
+        title: Text("Add Post"),
+        elevation: 0,
+      ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: titleController,
-              decoration: InputDecoration(labelText: "Title"),
+              decoration: InputDecoration(
+                labelText: "Title",
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                filled: true,
+                fillColor: Colors.grey[200],
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              ),
             ),
+            SizedBox(height: 20), 
             TextField(
               controller: bodyController,
-              decoration: InputDecoration(labelText: "Body"),
+              maxLines: 3, 
+              decoration: InputDecoration(
+                labelText: "Body",
+                floatingLabelBehavior:
+                    FloatingLabelBehavior.always, 
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ), 
+                filled: true,
+                fillColor: Colors.grey[200], 
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 14), 
+              ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 30), 
             ElevatedButton(
               onPressed: () async {
                 final title = titleController.text.trim();
@@ -65,7 +91,20 @@ class AddPostScreen extends StatelessWidget {
                   );
                 }
               },
-              child: Text("Add Post"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple, 
+                foregroundColor: Colors.white, 
+                padding: EdgeInsets.symmetric(
+                    horizontal: 24, vertical: 14), 
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ), 
+                elevation: 2,
+              ),
+              child: Text(
+                "Add Post",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
