@@ -13,12 +13,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(
-        () => Provider.of<PostProvider>(context, listen: false).loadPosts());
-  }
+  final int _itemsPerPage = 10;
+  int _currentPage = 1;
+  final ScrollController _scrollController = ScrollController();
 
   void _showDeleteConfirmation(BuildContext context, int postId) {
     showDialog(
@@ -52,6 +49,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  List<dynamic> _getPaginatedPosts(List<dynamic> allPosts) {
+    final startIndex = (_currentPage - 1) * _itemsPerPage;
+    final endIndex = startIndex + _itemsPerPage;
+    return allPosts.sublist(
+        startIndex, endIndex > allPosts.length ? allPosts.length : endIndex);
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0.0,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(
+        () => Provider.of<PostProvider>(context, listen: false).loadPosts());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,81 +87,108 @@ class _HomeScreenState extends State<HomeScreen> {
             return Center(child: CircularProgressIndicator());
           }
 
-          if (postProvider.errorMessage != null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, color: Colors.red, size: 60),
-                  SizedBox(height: 16),
-                  Text(
-                    postProvider.errorMessage!,
-                    style: TextStyle(color: Colors.red, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => postProvider.loadPosts(),
-                    child: Text("Retry"),
-                  )
-                ],
-              ),
-            );
-          }
+          final totalPosts = postProvider.posts.length;
+          final totalPages = (totalPosts / _itemsPerPage).ceil();
+          final currentPagePosts = _getPaginatedPosts(postProvider.posts);
 
-          if (postProvider.posts.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.post_add, color: Colors.grey, size: 60),
-                  SizedBox(height: 16),
-                  Text(
-                    "No posts available",
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => postProvider.loadPosts(),
-                    child: Text("Refresh"),
-                  )
-                ],
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: currentPagePosts.length,
+                  itemBuilder: (context, index) {
+                    final post = currentPagePosts[index];
+                    return PostCard(
+                      post: post,
+                      onEdit: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditPostScreen(post: post),
+                          ),
+                        );
+                      },
+                      onDelete: () {
+                        _showDeleteConfirmation(context, post.id);
+                      },
+                    );
+                  },
+                ),
               ),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: postProvider.posts.length,
-            itemBuilder: (context, index) {
-              final post = postProvider.posts[index];
-              return PostCard(
-                post: post,
-                onEdit: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditPostScreen(post: post),
+              Container(
+                color: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.first_page,
+                          color:
+                              _currentPage > 1 ? Colors.purple : Colors.grey),
+                      onPressed: _currentPage > 1
+                          ? () {
+                              setState(() => _currentPage = 1);
+                              _scrollToTop();
+                            }
+                          : null,
                     ),
-                  );
-                },
-                onDelete: () {
-                  _showDeleteConfirmation(context, post.id);
-                },
-              );
-            },
+                    IconButton(
+                      icon: Icon(Icons.chevron_left,
+                          color:
+                              _currentPage > 1 ? Colors.purple : Colors.grey),
+                      onPressed: _currentPage > 1
+                          ? () {
+                              setState(() => _currentPage--);
+                              _scrollToTop();
+                            }
+                          : null,
+                    ),
+                    Text('Page $_currentPage of $totalPages'),
+                    IconButton(
+                      icon: Icon(Icons.chevron_right,
+                          color: _currentPage < totalPages
+                              ? Colors.purple
+                              : Colors.grey),
+                      onPressed: _currentPage < totalPages
+                          ? () {
+                              setState(() => _currentPage++);
+                              _scrollToTop();
+                            }
+                          : null,
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.last_page,
+                          color: _currentPage < totalPages
+                              ? Colors.purple
+                              : Colors.grey),
+                      onPressed: _currentPage < totalPages
+                          ? () {
+                              setState(() => _currentPage = totalPages);
+                              _scrollToTop();
+                            }
+                          : null,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.purple,
-        child: Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddPostScreen()),
-          );
-        },
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 50.0),
+        child: FloatingActionButton(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.purple,
+          child: Icon(Icons.add),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddPostScreen()),
+            );
+          },
+        ),
       ),
     );
   }
