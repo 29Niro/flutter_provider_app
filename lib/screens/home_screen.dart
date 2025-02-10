@@ -20,6 +20,40 @@ class _HomeScreenState extends State<HomeScreen> {
         () => Provider.of<PostProvider>(context, listen: false).loadPosts());
   }
 
+  void _showDeleteConfirmation(BuildContext context, int postId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Delete Post"),
+          content: Text("Are you sure you want to delete this post?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // Cancel button
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Provider.of<PostProvider>(context, listen: false)
+                    .deletePost(postId);
+
+                Navigator.pop(context);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Post deleted successfully!"),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: Text("Delete", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
                 onDelete: () {
-                  postProvider.deletePost(post.id);
+                  _showDeleteConfirmation(context, post.id);
                 },
               );
             },
